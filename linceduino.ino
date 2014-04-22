@@ -128,7 +128,7 @@ leebotones(analogRead(0)); //comprueba que botón ha sido pulsado o sino se ha p
 if (nvueltas==1) {tiempo1=millis();}
 if (lineasBuffer >= REFRESCO_SD) {guardadatos();}
 
-velocidadm=(TWO_PI*radio*3.6*nvueltas)/(millis() - tiempo1);
+velocidadm = (TWO_PI*radio*3.6*nvueltas)/(millis() - tiempo1);
 
 lcd.setCursor(0,0);
 if((millis()-tiempopaso) < 3000) {lcd.print(nf(velocidad,2,1));}
@@ -140,12 +140,6 @@ lcd.print(nf(velocidadm,2,1));
 lcd.setCursor(15,0);
 if (botonpulsado==5) {lcd.print("G");}
 else {lcd.print("N");}
-
-//lcd.setCursor(14,0);
-//lcd.print(marcha);
-
-//lcd.setCursor(15,0);
-//lcd.print(paro);
 
 lcd.setCursor(10,0);
 if (vueltas<=9) {

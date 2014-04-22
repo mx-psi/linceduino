@@ -14,7 +14,7 @@ Velocímetro hecho con Arduino. Representa velocidad instantánea y media, dista
 
 ### Código utilizado
 
-Algunas partes del código utilizan funciones modificadas de las siguientes páginas:
+Algunas partes del código utilizan funciones modificadas extraidas de las siguientes páginas:
 
  * [Escribir datos en una tarjeta SD con Arduino](zygzax.com/2013/12/14/escribir-datos-en-una-tarjeta-sd-con-arduino-modulo-microsd-y-ethernet-shield/) de ZygZax
  * [LCD Shield with keypad para Arduino](itmanageratschool.blogspot.com.es/2012/05/lcd-shield-with-keypad-para-arduino.html) de IT Manager

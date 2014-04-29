@@ -5,34 +5,34 @@
 #define CS 4 // pin que marca el fabricante de SD Shield
 LiquidCrystal lcd(8, 9, 4, 5, 6, 7);
 
-float radio=329.93; // radio de la rueda en mm hay que poner la real del lince
-volatile float tiempopaso, tiempovuelta;//tiempo (hasta la activación del sensor y de una vuelta)
+float radio = 406.4; // radio de la rueda en mm hay que poner la real del lince
+volatile float tiempopaso, tiempovuelta; //tiempo (hasta la activación del sensor y de una vuelta)
 volatile float velocidad, velocidadm; //velocidades (instantánea y media)
 volatile float distancia; //distancia recorrida desde que empieza a circular
 volatile int lineasBuffer = 0; // lineas de buffer guardadas
 volatile int nvueltas = 0; //vuelta de rueda
-volatile int marcha,paro;// estado de pulsadores de impulso o paro
+volatile int marcha,paro; // estado de pulsadores de impulso o paro
 float minutos, segundos; //minutos y segundos desde el inicio
 int tiempo1; //tiempo inicial
 int vueltas; //vuelta del circuito
-String buffer=""; // Almacenamiento temporal de datos recogidos de ISR, para la tarjeta SD
+String buffer = "" ; // Almacenamiento temporal de datos recogidos de ISR, para la tarjeta SD
 volatile int botonpulsado=0;// Botón del lcdkeypad
 File dataFile; //Fichero para guardar datos
 bool c = true; //Booleano para la representación
 
 void setup() {
-attachInterrupt(2, calculos, RISING);//pin de interrupción 21 arduino mega para sensor hall
-attachInterrupt(4, calculosmarcha, RISING);//pin de interrupción 19 arduino mega: marcha
-attachInterrupt(5, calculosparo, RISING);//pin de interrupción 18 arduino mega: paro
+attachInterrupt(2, calculos, RISING); //pin de interrupción 21 arduino mega para sensor hall
+attachInterrupt(4, calculosmarcha, RISING); //pin de interrupción 19 arduino mega: marcha
+attachInterrupt(5, calculosparo, RISING); //pin de interrupción 18 arduino mega: paro
 lcd.begin(16, 2); //iniciamos la pantalla lcd
 pinMode(CS, OUTPUT);
-SD.begin(CS);//inicializa la SD (tiene que estar insertada) sólo lo hace una vez
+SD.begin(CS); //inicializa la SD (tiene que estar insertada) sólo lo hace una vez
 }
 
 void calculos() {
 //Calcula los datos a representar
 nvueltas++;
-tiempovuelta=millis()-tiempopaso;//tiempo por vuelta
+tiempovuelta=millis()-tiempopaso; //tiempo por vuelta
 tiempopaso=millis();//tiempo desde que se produjo la interrupcion
 velocidad=(TWO_PI*radio*3.6)/tiempovuelta; // (km/h), [mm/ms*3,6 para pasar a km/h]
 distancia=(nvueltas*TWO_PI*radio)/1000000; //distancia total (km)

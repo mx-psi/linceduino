@@ -5,7 +5,7 @@
 #define CS 4 // pin que marca el fabricante de SD Shield
 LiquidCrystal lcd(8, 9, 4, 5, 6, 7);
 
-float radio = 406.4; // radio de la rueda en mm hay que poner la real del lince
+float radio = 238.41; // radio de la rueda en mm hay que poner la real del lince
 volatile float tiempopaso, tiempovuelta; //tiempo (hasta la activación del sensor y de una vuelta)
 volatile float velocidad, velocidadm; //velocidades (instantánea y media)
 volatile float distancia; //distancia recorrida desde que empieza a circular

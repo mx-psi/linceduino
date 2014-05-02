@@ -5,40 +5,40 @@
 #define CS 4 // pin que marca el fabricante de SD Shield
 LiquidCrystal lcd(8, 9, 4, 5, 6, 7);
 
-float radio = 238.41; // radio de la rueda en mm hay que poner la real del lince
-volatile float tiempopaso, tiempovuelta; //tiempo (hasta la activación del sensor y de una vuelta)
+float radio=236.82; // radio de la rueda en mm hay que poner la real del lince
+volatile float tiempopaso, tiempovuelta;//tiempo (hasta la activación del sensor y de una vuelta)
 volatile float velocidad, velocidadm; //velocidades (instantánea y media)
 volatile float distancia; //distancia recorrida desde que empieza a circular
 volatile int lineasBuffer = 0; // lineas de buffer guardadas
 volatile int nvueltas = 0; //vuelta de rueda
-volatile int marcha,paro; // estado de pulsadores de impulso o paro
+volatile int marcha,paro;// estado de pulsadores de impulso o paro
 float minutos, segundos; //minutos y segundos desde el inicio
 int tiempo1; //tiempo inicial
 int vueltas; //vuelta del circuito
-String buffer = "" ; // Almacenamiento temporal de datos recogidos de ISR, para la tarjeta SD
+String buffer=""; // Almacenamiento temporal de datos recogidos de ISR, para la tarjeta SD
 volatile int botonpulsado=0;// Botón del lcdkeypad
 File dataFile; //Fichero para guardar datos
 bool c = true; //Booleano para la representación
 
 void setup() {
-attachInterrupt(2, calculos, RISING); //pin de interrupción 21 arduino mega para sensor hall
-attachInterrupt(4, calculosmarcha, RISING); //pin de interrupción 19 arduino mega: marcha
-attachInterrupt(5, calculosparo, RISING); //pin de interrupción 18 arduino mega: paro
+attachInterrupt(2, calculos, RISING);//pin de interrupción 21 arduino mega para sensor hall
+attachInterrupt(4, calculosmarcha, RISING);//pin de interrupción 19 arduino mega: marcha
+attachInterrupt(5, calculosparo, RISING);//pin de interrupción 18 arduino mega: paro
 lcd.begin(16, 2); //iniciamos la pantalla lcd
 pinMode(CS, OUTPUT);
-SD.begin(CS); //inicializa la SD (tiene que estar insertada) sólo lo hace una vez
+SD.begin(CS);//inicializa la SD (tiene que estar insertada) sólo lo hace una vez
 }
 
 void calculos() {
 //Calcula los datos a representar
 nvueltas++;
-tiempovuelta=millis()-tiempopaso; //tiempo por vuelta
+tiempovuelta=millis()-tiempopaso;//tiempo por vuelta
 tiempopaso=millis();//tiempo desde que se produjo la interrupcion
 velocidad=(TWO_PI*radio*3.6)/tiempovuelta; // (km/h), [mm/ms*3,6 para pasar a km/h]
 distancia=(nvueltas*TWO_PI*radio)/1000000; //distancia total (km)
 vueltas= int((distancia)/1.626)+1; // el circuito tiene 1626 m= 1.626 Km
 //solo guarda en buffer y por tanto guarda en fichero cuando si se ha pulsado el boton select
-if (botonpulsado==5) {guardabuffer();}
+guardabuffer();
 }
 
 void calculosmarcha() {
@@ -55,12 +55,12 @@ guardabuffer();
 
 void guardabuffer(){
 //Guarda los datos temporalmente en un buffer
-   //dataFile=SD.open("tele.txt", FILE_WRITE);
-if(botonpulsado==5) {
+   if(botonpulsado==5) {
    buffer += String(int((millis()-tiempo1)/1000));buffer += ";";
    buffer += nf(velocidad,2,2);buffer += ";";
    buffer += nf(velocidadm,2,2);buffer += ";";
    buffer += nf(distancia,2,2);buffer += ";";
+   buffer += vuelta;buffer += ";";
    buffer += marcha;buffer += ";";
    buffer +=paro; buffer += "\n";
    lineasBuffer++;
@@ -68,9 +68,7 @@ if(botonpulsado==5) {
 }
 
 void guardadatos(){
-
 //Guarda el buffer en un archivo
-
 dataFile = SD.open("tele.txt", FILE_WRITE);
 dataFile.print(buffer);
 lineasBuffer = 0;
@@ -84,7 +82,6 @@ else {lcd.print("-");}
 }
 
 String nf(float n, int cifras, int decimales) {
-
 // Formato de números, añade ‘0’ y trunca.
 
 String parte_entera = String(int(n) % int(pow(10,cifras))); //parte entera en modulo 10**cifras
@@ -120,7 +117,6 @@ if (valorsensor>600 && valorsensor<650) {botonpulsado=5;SD.begin(CS);} //boton s
 }
 
 void loop() {
-
 //Bucle principal. Representa y reinicia variables
 
 leebotones(analogRead(0)); //comprueba que botón ha sido pulsado o sino se ha pulsado (0)
@@ -128,7 +124,7 @@ leebotones(analogRead(0)); //comprueba que botón ha sido pulsado o sino se ha p
 if (nvueltas==1) {tiempo1=millis();}
 if (lineasBuffer >= REFRESCO_SD) {guardadatos();}
 
-velocidadm = (TWO_PI*radio*3.6*nvueltas)/(millis() - tiempo1);
+velocidadm=(TWO_PI*radio*3.6*nvueltas)/(millis() - tiempo1);
 
 lcd.setCursor(0,0);
 if((millis()-tiempopaso) < 3000) {lcd.print(nf(velocidad,2,1));}
@@ -140,6 +136,12 @@ lcd.print(nf(velocidadm,2,1));
 lcd.setCursor(15,0);
 if (botonpulsado==5) {lcd.print("G");}
 else {lcd.print("N");}
+
+//lcd.setCursor(14,0);
+//lcd.print(marcha);
+
+//lcd.setCursor(15,0);
+//lcd.print(paro);
 
 lcd.setCursor(10,0);
 if (vueltas<=9) {

@@ -125,7 +125,7 @@ velocidadm=(TWO_PI*radio*3.6*nvueltas)/(millis() - tiempo1);
 
 lcd.setCursor(0,0);
 if((millis()-tiempopaso) < 3000) {if (velocidad<100) {lcd.print(nf(velocidad,2,1));}}
-else {lcd.print(" 0.0");}//velocidad instantanea 0 si en 3 segundos no da vueltas
+else {lcd.print(" 0,0");}//velocidad instantanea 0 si en 3 segundos no da vueltas
 //si la velocidad es > 100 no representa
 
 lcd.setCursor(5,0);

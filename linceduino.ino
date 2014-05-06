@@ -13,7 +13,7 @@ volatile int lineasBuffer = 0; // lineas de buffer guardadas
 volatile int nvueltas = 0; //vuelta de rueda
 volatile int marcha,paro;// estado de pulsadores de impulso o paro
 float minutos, segundos; //minutos y segundos desde el inicio
-int tiempo1; //tiempo inicial
+unsigned long tiempo1=0; //tiempo inicial
 int vueltas; //vuelta del circuito
 String buffer=""; // Almacenamiento temporal de datos recogidos de ISR, para la tarjeta SD
 volatile int botonpulsado=0;// Botón del lcdkeypad
@@ -31,6 +31,7 @@ SD.begin(CS);//inicializa la SD (tiene que estar insertada) sólo lo hace una ve
 
 void calculos() {
 //Calcula los datos a representar
+//if (nvueltas==1) {tiempo1=millis();}
 nvueltas++;
 tiempovuelta=millis()-tiempopaso;//tiempo por vuelta
 tiempopaso=millis();//tiempo desde que se produjo la interrupcion
@@ -60,7 +61,7 @@ void guardabuffer(){
    buffer += nf(velocidad,2,2);buffer += ";";
    buffer += nf(velocidadm,2,2);buffer += ";";
    buffer += nf(distancia,2,2);buffer += ";";
-   buffer += vuelta;buffer += ";";
+   buffer += vueltas;buffer += ";";
    buffer += marcha;buffer += ";";
    buffer +=paro; buffer += "\n";
    lineasBuffer++;
@@ -82,28 +83,26 @@ else {lcd.print("-");}
 }
 
 String nf(float n, int cifras, int decimales) {
-// Formato de números, añade ‘0’ y trunca.
-
-String parte_entera = String(int(n) % int(pow(10,cifras))); //parte entera en modulo 10**cifras
-String parte_decimal = String(int(pow(10, decimales)*(n-floor(n))));
-
-while (parte_entera.length() < cifras) {
-parte_entera = "0" + parte_entera; //0 a la izquierda
+char numero [10];
+  dtostrf(n,(cifras+decimales+1),decimales,numero);
+  return numero;
 }
 
-while (parte_decimal.length() < decimales) {
-parte_decimal = parte_decimal + "0"; //0 a la derecha
- }
-
-if (decimales == 0) {return parte_entera;}
-else {return parte_entera + "," + parte_decimal;}
+String nftiempo(float n, int cifras, int decimales) {
+char numero [10];
+  dtostrf(n,(cifras+decimales),decimales,numero);
+  return numero;
 }
 
 String tiempo() {
 // Devuelve el tiempo de la forma ‘000:00’
 minutos = (millis()-tiempo1)/60000;
 segundos = ((millis()-tiempo1) % 60000)/1000;
-return nf(minutos, 3, 0) + ":" + nf(segundos, 2, 0);
+String s_string = String(nftiempo(segundos, 1, 0));
+while (s_string.length() < 2) {
+s_string = "0" + s_string; //0 a la izquierda
+}
+return nftiempo(minutos, 3, 0) + ":" + s_string;
 }
 
 void leebotones (int valorsensor) {
@@ -127,11 +126,12 @@ if (lineasBuffer >= REFRESCO_SD) {guardadatos();}
 velocidadm=(TWO_PI*radio*3.6*nvueltas)/(millis() - tiempo1);
 
 lcd.setCursor(0,0);
-if((millis()-tiempopaso) < 3000) {lcd.print(nf(velocidad,2,1));}
-else {lcd.print("00,0");}
+if((millis()-tiempopaso) < 3000) {if (velocidad<100) {lcd.print(nf(velocidad,2,1));}}
+else {lcd.print(" 0.0");}//velocidad instantanea 0 si en 3 segundos no da vueltas
+//si la velocidad es > 100 no representa
 
 lcd.setCursor(5,0);
-lcd.print(nf(velocidadm,2,1));
+if (velocidadm<100) {lcd.print(nf(velocidadm,2,1));}
 
 lcd.setCursor(15,0);
 if (botonpulsado==5) {lcd.print("G");}
@@ -150,13 +150,13 @@ lcd.print(vueltas);}
 else {lcd.print("FINAL");}
 
 lcd.setCursor(0,1);
-lcd.print(nf(distancia, 3, 2));
+lcd.print(nf(distancia,3,2));
 
 lcd.setCursor(7,1);
 lcd.print(tiempo());
 
 lcd.setCursor(14,1);
-if(velocidad>100){lcd.print("E");}
+if(velocidad>100 || velocidadm>100 ){lcd.print("E");}
 else{lcd.print(" ");}
 
 marcha=0;

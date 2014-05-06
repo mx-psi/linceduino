@@ -12,7 +12,9 @@ volatile float distancia; //distancia recorrida desde que empieza a circular
 volatile int lineasBuffer = 0; // lineas de buffer guardadas
 volatile int nvueltas = 0; //vuelta de rueda
 volatile int marcha,paro;// estado de pulsadores de impulso o paro
-float minutos, segundos; //minutos y segundos desde el inicio
+String minutos, segundos; //minutos y segundos desde el inicio
+char s_string [10];
+char m_string [10];
 unsigned long tiempo1=0; //tiempo inicial
 int vueltas; //vuelta del circuito
 String buffer=""; // Almacenamiento temporal de datos recogidos de ISR, para la tarjeta SD
@@ -88,21 +90,14 @@ char numero [10];
   return numero;
 }
 
-String nftiempo(float n, int cifras, int decimales) {
-char numero [10];
-  dtostrf(n,(cifras+decimales),decimales,numero);
-  return numero;
-}
-
 String tiempo() {
 // Devuelve el tiempo de la forma ‘000:00’
-minutos = (millis()-tiempo1)/60000;
-segundos = ((millis()-tiempo1) % 60000)/1000;
-String s_string = String(nftiempo(segundos, 1, 0));
-while (s_string.length() < 2) {
-s_string = "0" + s_string; //0 a la izquierda
-}
-return nftiempo(minutos, 3, 0) + ":" + s_string;
+dtostrf((millis()-tiempo1)/60000,3,0,m_string);
+dtostrf(((millis()-tiempo1) % 60000)/1000,1,0,s_string);
+minutos = String(m_string);
+segundos = String(s_string);
+if (segundos.length() < 2) {segundos = "0" + segundos;}
+return minutos + ":" + segundos;
 }
 
 void leebotones (int valorsensor) {

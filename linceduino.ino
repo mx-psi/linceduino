@@ -86,8 +86,11 @@ else {lcd.print("-");}
 
 String nf(float n, int cifras, int decimales) {
 char numero [10];
-  dtostrf(n,(cifras+decimales+1),decimales,numero);
-  return numero;
+dtostrf(n,(cifras+decimales+1),decimales,numero);
+int punto = String(numero).indexOf(".");
+String parte_entera = String(numero).substring(0,punto);
+String parte_decimal = String(numero).substring(punto+1);
+return parte_entera + "," + parte_decimal;
 }
 
 String tiempo() {
